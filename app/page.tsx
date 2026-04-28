@@ -1,22 +1,28 @@
-'use client';
+'use client'
 
-import { useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import { useAuth } from '@/lib/auth-context';
+import { useEffect } from 'react'
+import { useRouter } from 'next/navigation'
+import { createClient } from '@/lib/supabase/client'
 
 export default function Home() {
-  const router = useRouter();
-  const { isAuthenticated, loading } = useAuth();
+  const router = useRouter()
+  const supabase = createClient()
 
   useEffect(() => {
-    if (!loading) {
-      if (isAuthenticated) {
-        router.push('/dashboard');
+    const checkAuth = async () => {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser()
+
+      if (user) {
+        router.push('/dashboard')
       } else {
-        router.push('/login');
+        router.push('/auth/login')
       }
     }
-  }, [isAuthenticated, loading, router]);
+
+    checkAuth()
+  }, [router, supabase])
 
   return (
     <div className="flex items-center justify-center min-h-screen">
@@ -24,5 +30,5 @@ export default function Home() {
         <p className="text-gray-600">Loading...</p>
       </div>
     </div>
-  );
+  )
 }

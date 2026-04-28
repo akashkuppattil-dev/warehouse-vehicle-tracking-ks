@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint .",
-    "setup-db": "ts-node scripts/setup-db.ts"
+    "setup-supabase": "ts-node scripts/setup-supabase.ts"
   },
   "dependencies": {
     "@googlemaps/js-api-loader": "^2.0.2",
@@ -39,6 +39,8 @@
     "@radix-ui/react-toggle": "1.1.10",
     "@radix-ui/react-toggle-group": "1.1.11",
     "@radix-ui/react-tooltip": "1.2.8",
+    "@supabase/ssr": "^0.10.2",
+    "@supabase/supabase-js": "^2.105.0",
     "@vercel/analytics": "1.6.1",
     "autoprefixer": "^10.4.20",
     "axios": "^1.15.2",
