@@ -42,7 +42,12 @@ export default function MyDeliveriesPage() {
       const data = await response.json();
       setDeliveries(data);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load deliveries');
+      console.warn('API failed, falling back to mock my-deliveries data.');
+      setDeliveries([
+        { id: 1, order_id: 'ORD-2026-9081', status: 'in_transit', pickup_location: 'Main Warehouse, NJ', dropoff_location: 'Store #44, NY', created_at: new Date().toISOString() },
+        { id: 2, order_id: 'ORD-2026-8800', status: 'completed', pickup_location: 'Supplier Yard, CA', dropoff_location: 'Main Warehouse, NJ', created_at: new Date(Date.now() - 86400000).toISOString() },
+      ]);
+      setError('Offline mode: Showing mock delivery data.');
     }
   };
 
@@ -102,31 +107,11 @@ export default function MyDeliveriesPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="mx-auto max-w-7xl space-y-6">
       {/* Header */}
-      <header className="bg-white border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900">My Deliveries</h1>
-            <p className="text-sm text-gray-500">Your assigned deliveries</p>
-          </div>
-          <div className="flex gap-2">
-            <Button
-              variant="outline"
-              onClick={() => router.push('/dashboard')}
-            >
-              Dashboard
-            </Button>
-            <Button
-              onClick={() => router.push('/my-location')}
-            >
-              Share Location
-            </Button>
-          </div>
-        </div>
-      </header>
+      
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div>
         {error && (
           <Card className="mb-4 border-red-200 bg-red-50">
             <CardContent className="pt-4 text-red-700 text-sm">{error}</CardContent>
@@ -213,7 +198,7 @@ export default function MyDeliveriesPage() {
             ))
           )}
         </div>
-      </main>
+      </div>
     </div>
   );
 }

@@ -48,15 +48,21 @@ export default function MyLocationPage() {
   const fetchVehicles = async () => {
     try {
       const response = await fetch('/api/vehicles');
-      if (response.ok) {
-        const data = await response.json();
-        setVehicles(data);
-        if (data.length > 0) {
-          setSelectedVehicleId(data[0].id);
-        }
+      if (!response.ok) throw new Error('API failed');
+      const data = await response.json();
+      setVehicles(data);
+      if (data.length > 0) {
+        setSelectedVehicleId(data[0].id);
       }
     } catch (err) {
-      console.error('Failed to fetch vehicles:', err);
+      console.warn('API failed, falling back to mock vehicle data for location page.');
+      const mockVehicles = [
+        { id: 1, registration: 'NY-1020' },
+        { id: 2, registration: 'CA-5591' },
+      ];
+      setVehicles(mockVehicles);
+      setSelectedVehicleId(mockVehicles[0].id);
+      setError('Offline mode: Using simulated vehicles for location tracking.');
     }
   };
 
@@ -116,31 +122,11 @@ export default function MyLocationPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="mx-auto max-w-7xl space-y-6">
       {/* Header */}
-      <header className="bg-white border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900">Share My Location</h1>
-            <p className="text-sm text-gray-500">Let the office know where you are</p>
-          </div>
-          <div className="flex gap-2">
-            <Button
-              variant="outline"
-              onClick={() => router.push('/dashboard')}
-            >
-              Dashboard
-            </Button>
-            <Button
-              onClick={() => router.push('/my-deliveries')}
-            >
-              My Deliveries
-            </Button>
-          </div>
-        </div>
-      </header>
+      
 
-      <main className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div>
         {error && (
           <Card className="mb-4 border-red-200 bg-red-50">
             <CardContent className="pt-4 text-red-700 text-sm flex items-center gap-2">
@@ -241,9 +227,8 @@ export default function MyLocationPage() {
               ) : (
                 <Button
                   onClick={handleStopTracking}
-                  className="flex-1"
                   variant="outline"
-                  className="text-red-600 hover:text-red-700"
+                  className="flex-1 text-red-600 hover:text-red-700"
                 >
                   Stop Tracking
                 </Button>
@@ -284,7 +269,7 @@ export default function MyLocationPage() {
             </p>
           </CardContent>
         </Card>
-      </main>
+      </div>
     </div>
   );
 }

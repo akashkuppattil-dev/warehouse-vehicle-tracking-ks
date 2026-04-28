@@ -74,7 +74,24 @@ export default function TrackingPage() {
       setVehicles(vehicleMap);
       setLastUpdate(new Date());
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load tracking data');
+      console.warn('API failed, generating mock GPS tracking data.');
+      
+      const mockVehicles: Vehicle[] = [
+        { id: 1, registration: 'NY-1020', make: 'Ford', model: 'Transit', status: 'active' },
+        { id: 2, registration: 'CA-5591', make: 'Mercedes', model: 'Sprinter', status: 'active' }
+      ];
+      
+      const mockLocations: VehicleLocation[] = [
+        { vehicle_id: 1, latitude: 40.7128 + (Math.random() * 0.05), longitude: -74.0060 + (Math.random() * 0.05), accuracy: 5.2, timestamp: new Date().toISOString() },
+        { vehicle_id: 2, latitude: 34.0522 + (Math.random() * 0.05), longitude: -118.2437 + (Math.random() * 0.05), accuracy: 8.1, timestamp: new Date().toISOString() }
+      ];
+
+      setLocations(mockLocations);
+      const vehicleMap: Record<number, Vehicle> = {};
+      mockVehicles.forEach((v) => { vehicleMap[v.id] = v; });
+      setVehicles(vehicleMap);
+      setLastUpdate(new Date());
+      setError('Offline mode: Showing simulated live truck locations.');
     } finally {
       setIsLoading(false);
     }
@@ -89,35 +106,11 @@ export default function TrackingPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="mx-auto max-w-7xl space-y-6">
       {/* Header */}
-      <header className="bg-white border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900">Live Tracking</h1>
-            <p className="text-sm text-gray-500">Real-time vehicle location tracking</p>
-          </div>
-          <div className="flex gap-2">
-            <Button
-              onClick={fetchData}
-              disabled={isLoading}
-              variant="outline"
-              className="flex items-center gap-2"
-            >
-              <RefreshCw className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
-              Refresh
-            </Button>
-            <Button
-              variant="outline"
-              onClick={() => router.push('/dashboard')}
-            >
-              Back
-            </Button>
-          </div>
-        </div>
-      </header>
+      
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div>
         {error && (
           <Card className="mb-4 border-red-200 bg-red-50">
             <CardContent className="pt-4 text-red-700 text-sm">{error}</CardContent>
@@ -198,7 +191,7 @@ export default function TrackingPage() {
             )}
           </CardContent>
         </Card>
-      </main>
+      </div>
     </div>
   );
 }

@@ -5,22 +5,22 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/auth-context';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { VehicleForm, VehicleFormData } from '@/components/vehicle-form';
+import { DriverForm, DriverFormData } from '@/components/driver-form';
 import { Trash2, Edit2, Plus } from 'lucide-react';
 
-interface Vehicle extends VehicleFormData {
+interface Driver extends DriverFormData {
   id: number;
   created_at: string;
 }
 
-export default function VehiclesPage() {
+export default function DriversPage() {
   const router = useRouter();
   const { user, isAuthenticated, loading } = useAuth();
-  const [vehicles, setVehicles] = useState<Vehicle[]>([]);
+  const [drivers, setDrivers] = useState<Driver[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState<number | null>(null);
-  const [editingVehicle, setEditingVehicle] = useState<Vehicle | null>(null);
+  const [editingDriver, setEditingDriver] = useState<Driver | null>(null);
   const [error, setError] = useState('');
 
   useEffect(() => {
@@ -30,26 +30,32 @@ export default function VehiclesPage() {
   }, [isAuthenticated, loading, router]);
 
   useEffect(() => {
-    if (isAuthenticated && user?.role === 'admin' || user?.role === 'manager') {
-      fetchVehicles();
+    if (isAuthenticated && (user?.role === 'admin' || user?.role === 'manager')) {
+      fetchDrivers();
     }
   }, [isAuthenticated, user]);
 
-  const fetchVehicles = async () => {
+  const fetchDrivers = async () => {
     try {
-      const response = await fetch('/api/vehicles');
-      if (!response.ok) throw new Error('Failed to fetch vehicles');
+      const response = await fetch('/api/drivers');
+      if (!response.ok) throw new Error('Failed to fetch drivers');
       const data = await response.json();
-      setVehicles(data);
+      setDrivers(data);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load vehicles');
+      console.warn('API failed, falling back to mock driver data.');
+      setDrivers([
+        { id: 1, name: 'John Doe', email: 'driver@example.com', phone: '+1 555-0192', licenseNumber: 'DL-99411', status: 'active', created_at: new Date().toISOString() },
+        { id: 2, name: 'Sarah Smith', email: 'sarah.s@example.com', phone: '+1 555-8832', licenseNumber: 'DL-22105', status: 'inactive', created_at: new Date().toISOString() },
+        { id: 3, name: 'Michael Chen', email: 'michael.c@example.com', phone: '+1 555-4421', licenseNumber: 'DL-55201', status: 'on_leave', created_at: new Date().toISOString() },
+      ]);
+      setError('Offline mode: Showing mock driver data.');
     }
   };
 
-  const handleSubmit = async (formData: VehicleFormData) => {
+  const handleSubmit = async (formData: DriverFormData) => {
     setIsLoading(true);
     try {
-      const url = editingId ? `/api/vehicles/${editingId}` : '/api/vehicles';
+      const url = editingId ? `/api/drivers/${editingId}` : '/api/drivers';
       const method = editingId ? 'PUT' : 'POST';
 
       const response = await fetch(url, {
@@ -58,34 +64,34 @@ export default function VehiclesPage() {
         body: JSON.stringify(formData),
       });
 
-      if (!response.ok) throw new Error('Failed to save vehicle');
+      if (!response.ok) throw new Error('Failed to save driver');
       
-      await fetchVehicles();
+      await fetchDrivers();
       setShowForm(false);
       setEditingId(null);
-      setEditingVehicle(null);
+      setEditingDriver(null);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to save vehicle');
+      setError(err instanceof Error ? err.message : 'Failed to save driver');
     } finally {
       setIsLoading(false);
     }
   };
 
   const handleDelete = async (id: number) => {
-    if (!confirm('Are you sure you want to delete this vehicle?')) return;
+    if (!confirm('Are you sure you want to delete this driver?')) return;
 
     try {
-      const response = await fetch(`/api/vehicles/${id}`, { method: 'DELETE' });
-      if (!response.ok) throw new Error('Failed to delete vehicle');
-      await fetchVehicles();
+      const response = await fetch(`/api/drivers/${id}`, { method: 'DELETE' });
+      if (!response.ok) throw new Error('Failed to delete driver');
+      await fetchDrivers();
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to delete vehicle');
+      setError(err instanceof Error ? err.message : 'Failed to delete driver');
     }
   };
 
-  const handleEdit = (vehicle: Vehicle) => {
-    setEditingVehicle(vehicle);
-    setEditingId(vehicle.id);
+  const handleEdit = (driver: Driver) => {
+    setEditingDriver(driver);
+    setEditingId(driver.id);
     setShowForm(true);
   };
 
@@ -98,37 +104,11 @@ export default function VehiclesPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="mx-auto max-w-7xl space-y-6">
       {/* Header */}
-      <header className="bg-white border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900">Vehicles</h1>
-            <p className="text-sm text-gray-500">Manage your fleet</p>
-          </div>
-          <div className="flex gap-2">
-            <Button
-              onClick={() => {
-                setShowForm(!showForm);
-                setEditingId(null);
-                setEditingVehicle(null);
-              }}
-              className="flex items-center gap-2"
-            >
-              <Plus className="h-4 w-4" />
-              Add Vehicle
-            </Button>
-            <Button
-              variant="outline"
-              onClick={() => router.push('/dashboard')}
-            >
-              Back
-            </Button>
-          </div>
-        </div>
-      </header>
+      
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div>
         {error && (
           <Card className="mb-4 border-red-200 bg-red-50">
             <CardContent className="pt-4 text-red-700 text-sm">{error}</CardContent>
@@ -137,47 +117,45 @@ export default function VehiclesPage() {
 
         {showForm && (
           <div className="mb-8">
-            <VehicleForm
+            <DriverForm
               onSubmit={handleSubmit}
               isLoading={isLoading}
-              initialData={editingVehicle || {}}
-              submitLabel={editingId ? 'Update Vehicle' : 'Add Vehicle'}
+              initialData={editingDriver || {}}
+              submitLabel={editingId ? 'Update Driver' : 'Add Driver'}
             />
           </div>
         )}
 
         <div className="grid gap-4">
-          {vehicles.length === 0 ? (
+          {drivers.length === 0 ? (
             <Card>
               <CardContent className="pt-8 text-center text-gray-500">
-                No vehicles found. Add your first vehicle to get started.
+                No drivers found. Add your first driver to get started.
               </CardContent>
             </Card>
           ) : (
-            vehicles.map(vehicle => (
-              <Card key={vehicle.id}>
+            drivers.map(driver => (
+              <Card key={driver.id}>
                 <CardContent className="pt-6">
                   <div className="flex justify-between items-start">
                     <div className="flex-1">
-                      <h3 className="font-semibold text-lg text-gray-900">
-                        {vehicle.make} {vehicle.model}
-                      </h3>
+                      <h3 className="font-semibold text-lg text-gray-900">{driver.name}</h3>
                       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-2 text-sm text-gray-600">
                         <div>
-                          <p className="font-medium">Registration</p>
-                          <p>{vehicle.registration}</p>
+                          <p className="font-medium">Email</p>
+                          <p>{driver.email}</p>
                         </div>
                         <div>
-                          <p className="font-medium">Year</p>
-                          <p>{vehicle.year}</p>
+                          <p className="font-medium">Phone</p>
+                          <p>{driver.phone}</p>
                         </div>
                         <div>
-                          <p className="font-medium">Capacity</p>
-                          <p>{vehicle.capacity} kg</p>
+                          <p className="font-medium">License</p>
+                          <p>{driver.licenseNumber}</p>
                         </div>
                         <div>
                           <p className="font-medium">Status</p>
-                          <p className="capitalize">{vehicle.status}</p>
+                          <p className="capitalize">{driver.status.replace('_', ' ')}</p>
                         </div>
                       </div>
                     </div>
@@ -185,7 +163,7 @@ export default function VehiclesPage() {
                       <Button
                         size="sm"
                         variant="outline"
-                        onClick={() => handleEdit(vehicle)}
+                        onClick={() => handleEdit(driver)}
                         className="flex items-center gap-1"
                       >
                         <Edit2 className="h-4 w-4" />
@@ -193,7 +171,7 @@ export default function VehiclesPage() {
                       <Button
                         size="sm"
                         variant="destructive"
-                        onClick={() => handleDelete(vehicle.id)}
+                        onClick={() => handleDelete(driver.id)}
                         className="flex items-center gap-1"
                       >
                         <Trash2 className="h-4 w-4" />
@@ -205,7 +183,7 @@ export default function VehiclesPage() {
             ))
           )}
         </div>
-      </main>
+      </div>
     </div>
   );
 }

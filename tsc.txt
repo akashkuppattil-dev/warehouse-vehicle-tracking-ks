@@ -1,0 +1,31 @@
+﻿.next/dev/types/validator.ts(198,31): error TS2344: Type 'typeof import("F:/Free Lancing/Truck_Tracking/app/api/deliveries/[id]/route")' does not satisfy the constraint 'RouteHandlerConfig<"/api/deliveries/[id]">'.
+  Types of property 'GET' are incompatible.
+    Type '(request: NextRequest, { params }: { params: { id: string; }; }) => Promise<NextResponse<any>>' is not assignable to type '(request: NextRequest, context: { params: Promise<{ id: string; }>; }) => void | Response | Promise<void | Response>'.
+      Types of parameters '__1' and 'context' are incompatible.
+        Type '{ params: Promise<{ id: string; }>; }' is not assignable to type '{ params: { id: string; }; }'.
+          Types of property 'params' are incompatible.
+            Property 'id' is missing in type 'Promise<{ id: string; }>' but required in type '{ id: string; }'.
+.next/dev/types/validator.ts(225,31): error TS2344: Type 'typeof import("F:/Free Lancing/Truck_Tracking/app/api/drivers/[id]/route")' does not satisfy the constraint 'RouteHandlerConfig<"/api/drivers/[id]">'.
+  Types of property 'GET' are incompatible.
+    Type '(request: NextRequest, { params }: { params: { id: string; }; }) => Promise<NextResponse<any>>' is not assignable to type '(request: NextRequest, context: { params: Promise<{ id: string; }>; }) => void | Response | Promise<void | Response>'.
+      Types of parameters '__1' and 'context' are incompatible.
+        Type '{ params: Promise<{ id: string; }>; }' is not assignable to type '{ params: { id: string; }; }'.
+          Types of property 'params' are incompatible.
+            Property 'id' is missing in type 'Promise<{ id: string; }>' but required in type '{ id: string; }'.
+.next/dev/types/validator.ts(261,31): error TS2344: Type 'typeof import("F:/Free Lancing/Truck_Tracking/app/api/vehicles/[id]/route")' does not satisfy the constraint 'RouteHandlerConfig<"/api/vehicles/[id]">'.
+  Types of property 'GET' are incompatible.
+    Type '(request: NextRequest, { params }: { params: { id: string; }; }) => Promise<NextResponse<any>>' is not assignable to type '(request: NextRequest, context: { params: Promise<{ id: string; }>; }) => void | Response | Promise<void | Response>'.
+      Types of parameters '__1' and 'context' are incompatible.
+        Type '{ params: Promise<{ id: string; }>; }' is not assignable to type '{ params: { id: string; }; }'.
+          Types of property 'params' are incompatible.
+            Property 'id' is missing in type 'Promise<{ id: string; }>' but required in type '{ id: string; }'.
+app/(protected)/deliveries/page.tsx(47,165): error TS2353: Object literal may only specify known properties, and 'scheduledDate' does not exist in type 'Delivery'.
+app/(protected)/deliveries/page.tsx(48,171): error TS2353: Object literal may only specify known properties, and 'scheduledDate' does not exist in type 'Delivery'.
+app/(protected)/drivers/page.tsx(48,118): error TS2322: Type '"off_duty"' is not assignable to type '"active" | "inactive" | "on_leave"'.
+app/(protected)/my-location/page.tsx(232,19): error TS17001: JSX elements cannot have multiple attributes with the same name.
+components/tracking-map.tsx(28,29): error TS2503: Cannot find namespace 'google'.
+components/tracking-map.tsx(44,12): error TS2339: Property 'load' does not exist on type 'Loader'.
+lib/auth.ts(1,17): error TS7016: Could not find a declaration file for module 'jsonwebtoken'. 'F:/Free Lancing/Truck_Tracking/node_modules/.pnpm/jsonwebtoken@9.0.3/node_modules/jsonwebtoken/index.js' implicitly has an 'any' type.
+  Try `npm i --save-dev @types/jsonwebtoken` if it exists or add a new declaration (.d.ts) file containing `declare module 'jsonwebtoken';`
+lib/db.ts(1,22): error TS7016: Could not find a declaration file for module 'pg'. 'F:/Free Lancing/Truck_Tracking/node_modules/.pnpm/pg@8.20.0/node_modules/pg/esm/index.mjs' implicitly has an 'any' type.
+  Try `npm i --save-dev @types/pg` if it exists or add a new declaration (.d.ts) file containing `declare module 'pg';`

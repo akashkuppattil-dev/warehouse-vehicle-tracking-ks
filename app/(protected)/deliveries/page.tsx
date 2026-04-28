@@ -42,7 +42,12 @@ export default function DeliveriesPage() {
       const data = await response.json();
       setDeliveries(data);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load deliveries');
+      console.warn('API failed, falling back to mock deliveries data.');
+      setDeliveries([
+        { id: 1, orderId: 'ORD-2026-9081', status: 'in_transit', driverId: 1, vehicleId: 1, pickupLocation: 'Main Warehouse, NJ', dropoffLocation: 'Store #44, NY', created_at: new Date().toISOString() },
+        { id: 2, orderId: 'ORD-2026-9082', status: 'pending', driverId: 2, vehicleId: 2, pickupLocation: 'Supplier Yard, CA', dropoffLocation: 'Distribution Center, NV', created_at: new Date().toISOString() },
+      ]);
+      setError('Offline mode: Showing mock delivery data.');
     }
   };
 
@@ -113,37 +118,11 @@ export default function DeliveriesPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="mx-auto max-w-7xl space-y-6">
       {/* Header */}
-      <header className="bg-white border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900">Deliveries</h1>
-            <p className="text-sm text-gray-500">Manage delivery orders</p>
-          </div>
-          <div className="flex gap-2">
-            <Button
-              onClick={() => {
-                setShowForm(!showForm);
-                setEditingId(null);
-                setEditingDelivery(null);
-              }}
-              className="flex items-center gap-2"
-            >
-              <Plus className="h-4 w-4" />
-              Create Delivery
-            </Button>
-            <Button
-              variant="outline"
-              onClick={() => router.push('/dashboard')}
-            >
-              Back
-            </Button>
-          </div>
-        </div>
-      </header>
+      
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div>
         {error && (
           <Card className="mb-4 border-red-200 bg-red-50">
             <CardContent className="pt-4 text-red-700 text-sm">{error}</CardContent>
@@ -224,7 +203,7 @@ export default function DeliveriesPage() {
             ))
           )}
         </div>
-      </main>
+      </div>
     </div>
   );
 }
