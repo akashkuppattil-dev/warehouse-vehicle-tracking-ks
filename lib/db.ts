@@ -1,13 +1,13 @@
 import { Pool } from 'pg';
 
-const connectionString = process.env.DATABASE_URL;
+const connectionString = process.env.DATABASE_URL || '';
 
 if (!connectionString) {
-  throw new Error('DATABASE_URL environment variable is not set');
+  console.warn('DATABASE_URL environment variable is not set. API routes will fail at runtime.');
 }
 
 const pool = new Pool({
-  connectionString,
+  connectionString: connectionString || 'postgresql://dummy:dummy@localhost:5432/dummy',
 });
 
 export async function query(text: string, params?: any[]) {
