@@ -115,17 +115,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<AppUser | null>(null)
   const [loading, setLoading] = useState(true)
 
-  // MOCK IMPLEMENTATION
   const refreshUser = useCallback(async () => {
     try {
-      if (typeof window !== 'undefined') {
-        const storedUser = localStorage.getItem('mock_user')
-        if (storedUser) {
-          setUser(JSON.parse(storedUser))
-        } else {
-          setUser(null)
-        }
-      }
+      const currentUser = await loadCurrentUser()
+      setUser(currentUser)
     } catch (error) {
       console.error('[auth] Failed to load user', error)
       setUser(null)
@@ -138,29 +131,26 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     void refreshUser()
   }, [refreshUser])
 
-  const login = useCallback(async (email: string, password: string) => {
-    // Mock login logic
-    const role = DEMO_ROLE_BY_EMAIL[email.toLowerCase()]
-    if (!role) {
-      // For dynamically created users during the test
-      const storedUsers = JSON.parse(localStorage.getItem('mock_created_users') || '[]')
-      const foundUser = storedUsers.find((u: any) => u.email === email && u.password === password)
-      if (foundUser) {
-        const appUser = { id: foundUser.id, email: foundUser.email, role: foundUser.role }
-        localStorage.setItem('mock_user', JSON.stringify(appUser))
-        setUser(appUser)
-        return
+  const login = useCallback(
+    async (email: string, password: string) => {
+      const supabase = createClient()
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      })
+
+      if (error) {
+        throw error
       }
-      throw new Error('Invalid login credentials')
-    }
-    
-    const appUser = { id: `mock-${role}`, email, role }
-    localStorage.setItem('mock_user', JSON.stringify(appUser))
-    setUser(appUser)
-  }, [])
+
+      await refreshUser()
+    },
+    [refreshUser],
+  )
 
   const logout = useCallback(async () => {
-    localStorage.removeItem('mock_user')
+    const supabase = createClient()
+    await supabase.auth.signOut()
     setUser(null)
   }, [])
 
